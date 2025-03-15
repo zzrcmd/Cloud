@@ -1,31 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-<script>
-  async function loadData() {
-    const response = await fetch('https://hy1fly.github.io/YF-Cloud/data.json');
-    const data = await response.json();
-    document.getElementById('data-container').innerHTML = `
-      <h2>${data.title}</h2>
-      <p>${data.content}</p>
-    `;
-  }
-  loadData();
-</script>
-
-<div id="data-container">加载中...</div>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YF-Cloud | Releases & Discussions</title>
+  <title>YF-Cloud | 资源中心</title>
   <style>
+    @font-face {
+      font-family: 'CustomFont';
+      src: url('Font.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     :root {
       --primary-color: #2c3e50;
       --secondary-color: #3498db;
       --text-color: #34495e;
+      --font-main: 'CustomFont', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --announcement-color: #fff3cd;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: var(--font-main);
       background-color: #f8f9fa;
       margin: 20px;
       color: var(--text-color);
@@ -43,13 +39,40 @@
       text-align: center;
       color: var(--primary-color);
       grid-column: 1 / -1;
+      margin-bottom: 20px;
     }
 
-    .section-title {
-      color: var(--secondary-color);
-      border-bottom: 2px solid var(--secondary-color);
-      padding-bottom: 10px;
-      margin: 30px 0 20px;
+    /* 公告栏样式 */
+    .announcement-section {
+      grid-column: 1 / -1;
+      background: var(--announcement-color);
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #ffecb5;
+      margin-bottom: 30px;
+    }
+
+    .announcement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .announcement-title {
+      color: #856404;
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .refresh-button {
+      background: none;
+      border: 1px solid #856404;
+      color: #856404;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
     /* 文件发布区域样式 */
@@ -68,36 +91,6 @@
       border: 1px solid #e0e0e0;
     }
 
-    .release-header h3 {
-      margin: 0;
-      color: var(--primary-color);
-    }
-
-    .release-meta {
-      color: #95a5a6;
-      font-size: 0.9em;
-      margin: 5px 0;
-    }
-
-    .assets {
-      list-style-type: none;
-      padding: 0;
-      margin: 10px 0;
-    }
-
-    .assets li {
-      margin: 5px 0;
-    }
-
-    .assets a {
-      text-decoration: none;
-      color: var(--secondary-color);
-    }
-
-    .assets a:hover {
-      text-decoration: underline;
-    }
-
     /* 讨论区专用样式 */
     .discussion-section {
       background: white;
@@ -106,17 +99,19 @@
       box-shadow: 0 2px 15px rgba(0,0,0,0.1);
     }
 
+    .section-title {
+      color: var(--secondary-color);
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 10px;
+      margin: 30px 0 20px;
+    }
+
     .issue {
       margin: 20px 0;
       padding: 15px;
       background: #fff;
       border: 1px solid #e0e0e0;
       border-radius: 8px;
-    }
-
-    .issue-header h3 {
-      margin: 10px 0;
-      color: var(--primary-color);
     }
 
     .comment {
@@ -156,69 +151,66 @@
       font-size: 0.85em;
     }
 
-    .comment-body {
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-
-    /* 评论表单样式 */
-    .comment-form {
-      margin-top: 20px;
-      padding: 15px;
+    /* 快速创建表单样式 */
+    .quick-create {
       background: #f8f9fa;
+      padding: 20px;
       border-radius: 8px;
-    }
-
-    .comment-form textarea {
-      width: 100%;
-      padding: 10px;
+      margin: 20px 0;
       border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 14px;
-      resize: vertical;
-      min-height: 100px;
-      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .comment-form button {
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--secondary-color);
+      outline: none;
+    }
+
+    .submit-button {
       background: var(--secondary-color);
       color: white;
+      padding: 12px 24px;
       border: none;
-      padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .comment-form button:hover {
-      background: #2980b9;
-    }
-
-    .comment-form button:disabled {
-      background: #bdc3c7;
-      cursor: not-allowed;
-    }
-
-    /* 公共交互元素 */
-    .toggle-button {
-      cursor: pointer;
-      color: var(--secondary-color);
-      padding: 8px 12px;
-      border: 1px solid var(--secondary-color);
-      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
       transition: all 0.3s;
     }
 
-    .toggle-button:hover {
-      background: var(--secondary-color);
-      color: white;
+    .loading-text,
+    .error-text {
+      text-align: center;
+      color: #95a5a6;
+      padding: 20px;
     }
   </style>
 </head>
 <body>
   <h1>YF-Cloud 资源中心</h1>
   <div class="container">
+    <!-- 公告区域 -->
+    <div class="announcement-section">
+      <div class="announcement-header">
+        <h2 class="announcement-title">📢 系统公告</h2>
+        <button class="refresh-button" onclick="fetchAnnouncement()">刷新</button>
+      </div>
+      <div id="announcement-content" class="announcement-content">
+        <div class="loading-text">加载公告中...</div>
+      </div>
+    </div>
+
     <!-- 文件发布区域 -->
     <div class="release-section">
       <h2 class="section-title">📦 文件发布</h2>
@@ -228,13 +220,51 @@
     <!-- 讨论区 -->
     <div class="discussion-section">
       <h2 class="section-title">💬 社区讨论</h2>
+      
+      <div class="quick-create">
+        <h3 style="margin-top:0; color: var(--primary-color);">📝 新建讨论</h3>
+        <input type="text" id="issueTitle" 
+               placeholder="输入讨论标题（必填）" 
+               class="form-input"
+               required>
+        <textarea id="issueBody" 
+                  class="form-textarea"
+                  placeholder="输入讨论内容（支持Markdown格式）"></textarea>
+        <button onclick="createNewIssue()" 
+                class="submit-button">
+          创建讨论
+        </button>
+      </div>
+
       <div id="discussions"></div>
     </div>
   </div>
 
   <script>
-    // GitHub Token（请替换为您的 Token）
-    const GITHUB_TOKEN = 'ghp_your_token_here'; // 注意：不要将 Token 直接暴露在前端代码中！
+    // 获取公告内容
+    async function fetchAnnouncement() {
+      const contentDiv = document.getElementById('announcement-content');
+      try {
+        contentDiv.innerHTML = '<div class="loading-text">加载中...</div>';
+        
+        const response = await fetch('https://raw.githubusercontent.com/Hy1Fly/YF-Cloud/main/home.txt');
+        if (!response.ok) throw new Error('加载失败');
+        
+        const text = await response.text();
+        contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+      } catch (error) {
+        console.error('公告加载失败:', error);
+        contentDiv.innerHTML = `
+          <div class="error-text">
+            公告加载失败，请稍后重试
+            <button onclick="fetchAnnouncement()" 
+                    style="margin-left:10px;padding:5px 10px;">
+              重试
+            </button>
+          </div>
+        `;
+      }
+    }
 
     // 获取并显示文件发布
     async function fetchReleases() {
@@ -262,8 +292,9 @@
                 </li>
               `).join('')}
             </ul>
-            <button class="toggle-button" onclick="this.parentElement.querySelector('.assets').style.display = 
-              this.parentElement.querySelector('.assets').style.display === 'none' ? 'block' : 'none'">
+            <button class="submit-button" onclick="this.parentElement.querySelector('.assets').style.display = 
+              this.parentElement.querySelector('.assets').style.display === 'none' ? 'block' : 'none'"
+              style="margin-top:10px;padding:8px 15px;">
               显示/隐藏资源
             </button>
           `;
@@ -294,15 +325,12 @@
               </div>
               <h3>${issue.title}</h3>
               <p>${issue.body}</p>
-              <button class="toggle-button" onclick="loadComments(this, ${issue.number})">
+              <button class="submit-button" onclick="loadComments(this, ${issue.number})"
+                style="margin-top:10px;padding:8px 15px;">
                 显示评论 (${issue.comments})
               </button>
             </div>
             <div class="comments-container" style="display:none;"></div>
-            <div class="comment-form">
-              <textarea id="comment-${issue.number}" placeholder="写下您的评论..."></textarea>
-              <button onclick="postComment(${issue.number})">提交评论</button>
-            </div>
           `;
           document.getElementById('discussions').appendChild(issueDiv);
         });
@@ -339,42 +367,41 @@
       container.style.display = container.style.display === 'none' ? 'block' : 'none';
     }
 
-    // 提交评论
-    async function postComment(issueNumber) {
-      const commentInput = document.getElementById(`comment-${issueNumber}`);
-      const commentText = commentInput.value.trim();
-
-      if (!commentText) {
-        alert('评论内容不能为空！');
+    // 创建新Issue
+    function createNewIssue() {
+      const titleInput = document.getElementById('issueTitle');
+      const bodyInput = document.getElementById('issueBody');
+      
+      if (!titleInput.value.trim()) {
+        titleInput.focus();
+        titleInput.style.borderColor = '#e74c3c';
+        setTimeout(() => titleInput.style.borderColor = '#e0e0e0', 2000);
         return;
       }
 
-      try {
-        const response = await fetch(`https://api.github.com/repos/Hy1Fly/YF-Cloud/issues/${issueNumber}/comments`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ body: commentText }),
-        });
+      const baseUrl = 'https://github.com/Hy1Fly/YF-Cloud/issues/new';
+      const params = new URLSearchParams({
+        title: titleInput.value.trim(),
+        body: bodyInput.value.trim(),
+        labels: 'user-generated'
+      });
 
-        if (response.ok) {
-          alert('评论提交成功！');
-          commentInput.value = ''; // 清空输入框
-          loadComments(document.querySelector(`#comment-${issueNumber}`).closest('.issue').querySelector('.toggle-button'), issueNumber); // 刷新评论列表
-        } else {
-          alert('评论提交失败，请重试。');
-        }
-      } catch (error) {
-        console.error('提交评论失败:', error);
-        alert('提交评论时发生错误，请检查网络或 Token 权限。');
+      const newWindow = window.open(`${baseUrl}?${params.toString()}`, '_blank');
+      
+      if (newWindow) {
+        titleInput.value = '';
+        bodyInput.value = '';
+        titleInput.style.borderColor = '#2ecc71';
+        setTimeout(() => titleInput.style.borderColor = '#e0e0e0', 1000);
       }
     }
 
     // 初始化加载
-    fetchReleases();
-    fetchDiscussions();
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchAnnouncement();
+      fetchReleases();
+      fetchDiscussions();
+    });
   </script>
 </body>
 </html>
