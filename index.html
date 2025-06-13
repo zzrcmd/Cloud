@@ -640,6 +640,19 @@ body[data-theme="dark"] .stat-label {
     font-size: 0.9rem;
   }
 }
+
+.ip-card-fixed {
+  position: fixed;
+  right: 20px; /* 距离页面右侧 20px */
+  bottom: 20px; /* 距离页面底部 20px */
+  z-index: 1000; /* 确保卡片显示在其他元素之上 */
+}
+
+.ip-card-fixed img {
+  max-width: 100%; /* 图片最大宽度为容器宽度 */
+  height: auto; /* 高度自适应 */
+}
+
   </style>
 </head>
 <body>
@@ -655,6 +668,9 @@ body[data-theme="dark"] .stat-label {
         <i class="fas fa-cloud"></i>
       </div>
       <h1>吉吉-Cloud 资源中心</h1>
+    </div>
+    <div class="ip-card-fixed">
+      <img src="https://tool.lu/netcard/">
     </div>
     <p class="subtitle">提供各种最新资源下载与“学习”交流平台</p>
   </header>
@@ -689,11 +705,6 @@ body[data-theme="dark"] .stat-label {
     <div class="stat-value" id="download-count">1.2K</div>
     <div class="stat-label">总下载量</div>
   </div>
-</div>
-
-<!-- 添加 IP 地址卡 -->
-<div class="ip-card">
-  <img src="https://tool.lu/netcard/">
 </div>
 
 <div class="release-section">
